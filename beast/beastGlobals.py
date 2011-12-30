@@ -241,7 +241,6 @@ if hasattr(__builtins__, 'beast') == False:
 	if __name__ == '__main__':
 		import direct.directbase.DirectStart
 	__builtin__.beast = beastGlobals()
-	print 'INSTALLED!'
 
 
 ''' display smileys on each relative point '''

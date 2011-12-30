@@ -13,3 +13,4 @@ from beastGlobals import *
 from beastNodePath import *
 from beastSprite import *
 from beastButton import *
+from beastEntry import *
