@@ -63,7 +63,9 @@ class beastButton(beastNodePath, beastSpriteOptions, DirectObject):
 		if (name.startswith('set') or name.startswith('get')) and name in dir(beastSpriteOptions):
 			def callme(*args, **kwargs):
 				func = getattr(beastSpriteOptions, name)
-				func(self, *args, **kwargs)
+				ret = func(self, *args, **kwargs)
+				if name.startswith('get'):
+					return ret #- No need to go to children
 				for key, value in self.states.items():
 					func = getattr(value, name)
 					func(*args, **kwargs)

@@ -9,9 +9,11 @@ from beast import *
 
 btn = beastButton('mybutton')
 btn.setText('Hello world!')
-btn.setFontSize(32)
+btn.setFontSize(12)
 btn.reparentTo(point2d)
 btn.setPos(0, 0, 300)
+
+messenger.toggleVerbose()
 
 entry = beastEntry('myentry')
 entry.setText('Hello world!')

@@ -25,8 +25,12 @@ class beastEntry(beastNodePath, beastSpriteOptions, DirectObject):
 		self.accept('keystroke', self.__keystroke)
 
 	def __keystroke(self, key):
-		print self.getText()
-		self.setText(self.getText() + key)
+		if self.getFocus() == False:
+			return
+		newText = self.getText() + key
+		if newText != self.getText():
+			self.setRequiresUpdate(True)
+		self.setText(newText)
 
 	def __foo(self):
 		pass
@@ -63,7 +67,9 @@ class beastEntry(beastNodePath, beastSpriteOptions, DirectObject):
 		if (name.startswith('set') or name.startswith('get')) and name in dir(beastSpriteOptions):
 			def callme(*args, **kwargs):
 				func = getattr(beastSpriteOptions, name)
-				func(self, *args, **kwargs)
+				ret = func(self, *args, **kwargs)
+				if name.startswith('get'):
+					return ret #- No need to go to children
 				for key, value in self.states.items():
 					func = getattr(value, name)
 					func(*args, **kwargs)
@@ -131,11 +137,18 @@ class beastEntry(beastNodePath, beastSpriteOptions, DirectObject):
 			ar[2] = default
 		if ar[3] == None:
 			ar[3] = default
-		messenger.toggleVerbose()
 		if self.__focus:
 			self.node().setup(ar[1], ar[1], ar[1], ar[3])
+		#	self.node().setFocus(True)
+		#	for bt in base.buttonThrowers:
+		#		bt = bt.node()
+		#		bt.setPrefix(str(self.node().getId())+'-')
 		else:
 			self.node().setup(ar[0], ar[1], ar[2], ar[3])
+		#	self.node().setFocus(False)
+		#	for bt in base.buttonThrowers:
+		#		bt = bt.node()
+		#		bt.setPrefix('')
 
 	def setFocus(self, value):
 		if value != self.__focus:
