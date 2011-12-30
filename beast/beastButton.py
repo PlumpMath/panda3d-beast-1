@@ -34,6 +34,10 @@ class beastButton(beastNodePath, beastSpriteOptions, DirectObject):
 		for ev in (b.enter, b.exit, b.within, b.without, b.leftPress, b.centerPress, b.rightPress, b.leftClick, b.centerClick, b.rightClick, b.leftRelease, b.centerRelease, b.rightRelease, b.wheelUp, b.wheelDown):
 			self.bind(ev, self.__foo)
 
+	def _update(self):
+		self.node().setSuppressFlags(self.getSuppressFlags())
+		self.setRequiresUpdate(True)
+
 	def __foo(self):
 		pass
 

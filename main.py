@@ -7,17 +7,11 @@ hmm = ShowBase()
 
 from beast import *
 
-btn = beastButton('mybutton')
-btn.setText('Hello world!')
-btn.setFontSize(12)
-btn.reparentTo(point2d)
-btn.setPos(0, 0, 300)
-
-messenger.toggleVerbose()
+#messenger.toggleVerbose()
 
 entry = beastEntry('myentry')
 entry.setText('Hello world!')
-entry.setFontSize(32)
+entry.setFontSize(25)
 entry.reparentTo(point2d)
 entry.getState('default').setBackgroundColor((1, 1, 1, 1))
 entry.getState('hover').setBackgroundColor((0, 0, 1, 1))

@@ -3,6 +3,7 @@
 #- Beast - An Panda3d user interface library - See included "License.txt" - #
 #---------------------------------------------------------------------------#
 #- Beast, beastSpriteOptions.py manages all options for visual effects of a beastSprite
+from panda3d.core import MouseWatcherRegion
 
 class beastSpriteOptions:
 	def __init__(self):
@@ -18,8 +19,19 @@ class beastSpriteOptions:
 		self.__font = ''
 		self.__fontSize = 12
 		self.__fontStyle = ()
+		self.__suppressMouse = True
+		self.__suppressKeys = False
 		self.__margin = [0, 0, 0, 0]
 		self.__padding = [0, 0, 0, 0]
+
+	def getSuppressFlags(self):
+		suppressFlags = 0
+		if self.__suppressMouse:
+			suppressFlags |= MouseWatcherRegion.SFMouseButton
+			suppressFlags |= MouseWatcherRegion.SFMousePosition
+		if self.__suppressKeys:
+			suppressFlags |= MouseWatcherRegion.SFOtherButton
+		return suppressFlags
 
 	def copyOptionsFrom(self, src):
 		b = beastSpriteOptions
@@ -52,93 +64,153 @@ class beastSpriteOptions:
 	'''
 		Set options
 	'''
+	def setSuppressMouse(self, value):
+		a = self.__suppressMouse
+		self.__suppressMouse = value
+		if a != value:
+			self._update()
+
+	def setSuppressKeys(self, value):
+		a = self.__suppressKeys
+		self.__suppressKeys = value
+		if a != value:
+			self._update()
+
 	def setText(self, text):
+		a = self.__text
 		self.__text = text
-		self._update()
+		if a != text:
+			self._update()
 
 	def setSize(self, left, right, bottom, top):
+		a = self.__size
 		self.__size = left, right, bottom, top
-		self._update()
+		if a != (left, right, bottom, top):
+			self._update()
 
 	def setBorder(self, border):
+		a = self.__border
 		self.__border = border
-		self._update()
+		if a != border:
+			self._update()
 
 	def setBorderColor(self, color):
-		self.__color = color
-		self._update()
+		a = self.__borderColor
+		self.__borderColor = color
+		if a != color:
+			self._update()
 
 	def setStretchingCorners(self, size):
+		a = self.__stretchingCorners
 		self.__stretchingCorners = size
-		self._update()
+		if a != size:
+			self._update()
 
 	def setBackgroundColor(self, color):
+		a = self.__backgroundColor
 		self.__backgroundColor = color
-		self._update()
+		if a != color:
+			self._update()
 
 	def setBackgroundImage(self, path):
+		a = self.__backgroundImage
 		self.__backgroundImage = path
-		self._update()
+		if a != path:
+			self._update()
 
 	def setBackgroundTexture(self, texture):
+		a = self.__backgroundTexture
 		self.__backgroundTexture = texture
-		self._update()
+		if a != texture:
+			self._update()
 
 	def setFont(self, font):
+		a = self.__font
 		self.__font = font
-		self._update()
+		if a != font:
+			self._update()
 
 	def setFontSize(self, size):
+		a = self.__fontSize
 		self.__fontSize = size
-		self._update()
+		if a != size:
+			self._update()
 
 	def setFontStyle(self, *style):
+		a = self.__fontStyle
 		self.__fontStyle = style
-		self._update()
+		if a != style:
+			self._update()
 
 	def setMargin(self, left, right, bottom, top):
+		a = self.__margin
 		self.__margin = left, right, bottom, top
-		self._update()
+		if a != (left, right, bottom, top):
+			self._update()
 
 	def setMarginLeft(self, left):
+		a = self.__margin[0]
 		self.__margin[0] = left
-		self._update()
+		if a != left:
+			self._update()
 
 	def setMarginRight(self, right):
+		a = self.__margin[1]
 		self.__margin[1] = right
-		self._update()
+		if a != right:
+			self._update()
 
 	def setMarginBottom(self, bottom):
+		a = self.__margin[2]
 		self.__margin[2] = bottom
-		self._update()
+		if a != bottom:
+			self._update()
 
 	def setMarginTop(self, top):
+		a = self.__margin[3]
 		self.__margin[3] = top
-		self._update()
+		if a != top:
+			self._update()
 
 	def setPadding(self, left, right, bottom, top):
+		a = self.__padding
 		self.__padding = left, right, bottom, top
-		self._update()
+		if a != (left, right, bottom, top):
+			self._update()
 
 	def setPaddingLeft(self, left):
+		a = self.__padding[0]
 		self.__padding[0] = left
-		self._update()
+		if a != left:
+			self._update()
 
 	def setPaddingRight(self, right):
+		a = self.__padding[1]
 		self.__padding[1] = right
-		self._update()
+		if a != right:
+			self._update()
 
 	def setPaddingBottom(self, bottom):
+		a = self.__padding[2]
 		self.__padding[2] = bottom
-		self._update()
+		if a != bottom:
+			self._update()
 
 	def setPaddingTop(self, top):
+		a = self.__padding[3]
 		self.__padding[3] = top
-		self._update()
+		if a != top:
+			self._update()
 
 	'''
 		Get options
 	'''
+	def getSuppressMouse(self):
+		return self.__suppressMouse
+
+	def getSuppressKeys(self):
+		return self.__suppressKeys
+
 	def getText(self):
 		return self.__text
 

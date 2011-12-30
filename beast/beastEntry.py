@@ -22,14 +22,22 @@ class beastEntry(beastNodePath, beastSpriteOptions, DirectObject):
 		b = beast
 		for ev in (b.enter, b.exit, b.within, b.without, b.leftPress, b.centerPress, b.rightPress, b.leftClick, b.centerClick, b.rightClick, b.leftRelease, b.centerRelease, b.rightRelease, b.wheelUp, b.wheelDown):
 			self.bind(ev, self.__foo)
-		self.accept('keystroke', self.__keystroke)
+		self.setSuppressKeys(True)
+		self.accept('keystroke-'+self.node().getId(), self.__keystroke)
 
-	def __keystroke(self, key):
-		if self.getFocus() == False:
+	def _update(self):
+		self.node().setSuppressFlags(self.getSuppressFlags())
+		self.setRequiresUpdate(True)
+
+	def __keystroke(self, mwp):
+		if self.getFocus() == False or mwp.hasKeycode() == False:
 			return
+		if self.getCurrentState().getTextNode().hasCharacter(mwp.getKeycode()) == False:
+			print ':beastEntry: TextNode.hasCharacter(%s) != True' % mwp.getKeycode()
+			return
+
+		key = chr(mwp.getKeycode())
 		newText = self.getText() + key
-		if newText != self.getText():
-			self.setRequiresUpdate(True)
 		self.setText(newText)
 
 	def __foo(self):
@@ -139,13 +147,13 @@ class beastEntry(beastNodePath, beastSpriteOptions, DirectObject):
 			ar[3] = default
 		if self.__focus:
 			self.node().setup(ar[1], ar[1], ar[1], ar[3])
-		#	self.node().setFocus(True)
+			self.node().setFocus(True)
 		#	for bt in base.buttonThrowers:
 		#		bt = bt.node()
 		#		bt.setPrefix(str(self.node().getId())+'-')
 		else:
 			self.node().setup(ar[0], ar[1], ar[2], ar[3])
-		#	self.node().setFocus(False)
+			self.node().setFocus(False)
 		#	for bt in base.buttonThrowers:
 		#		bt = bt.node()
 		#		bt.setPrefix('')
