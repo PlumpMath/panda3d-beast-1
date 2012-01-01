@@ -23,6 +23,7 @@ class beastEntry(beastNodePath, beastSpriteOptions, DirectObject):
 		for ev in (b.enter, b.exit, b.within, b.without, b.leftPress, b.centerPress, b.rightPress, b.leftClick, b.centerClick, b.rightClick, b.leftRelease, b.centerRelease, b.rightRelease, b.wheelUp, b.wheelDown):
 			self.bind(ev, self.__foo)
 		self.setSuppressKeys(True)
+		self.getCurrentState().getTextNode().setMaxRows(9)
 		self.accept('keystroke-'+self.node().getId(), self.__keystroke)
 
 	def _update(self):
@@ -32,13 +33,18 @@ class beastEntry(beastNodePath, beastSpriteOptions, DirectObject):
 	def __keystroke(self, mwp):
 		if self.getFocus() == False or mwp.hasKeycode() == False:
 			return
-		if self.getCurrentState().getTextNode().hasCharacter(mwp.getKeycode()) == False:
-			print ':beastEntry: TextNode.hasCharacter(%s) != True' % mwp.getKeycode()
-			return
-
-		key = chr(mwp.getKeycode())
-		newText = self.getText() + key
-		self.setText(newText)
+		code = mwp.getKeycode()
+		if code == 8: #- backspace
+			self.setText(self.getText()[:-1])
+		elif code == 13: #- enteer
+			self.setText(self.getText() + '\n')
+		else:
+			if self.getCurrentState().getTextNode().hasCharacter(code) == False:
+				print ':beastEntry: TextNode.hasCharacter(%s) != True' % code
+				return
+			key = chr(code)
+			print repr(key), code
+			self.setText(self.getText() + key)
 
 	def __foo(self):
 		pass

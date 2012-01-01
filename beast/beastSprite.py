@@ -108,7 +108,18 @@ class beastSprite(beastSpriteOptions, beastNodePath):
 		if tn.getText() != ' ':
 			self.setScale(self.getFontSize())
 			p = self.getStretchingCorners() / self.getScale()[0]
-			tn.setCardAsMargin(p, p, p, p)
+			#- This is a fix for whitespace bug in TextNode
+			#- See this forum post for more information:
+			#- http://www.panda3d.org/forums/viewtopic.php?p=80596#80596
+			#- Oddly enough, TextNode.calcWidth() calculates the width properly
+			#- tn.setCardAsMargin(p, p, p, p) <- Should have worked
+			#- Instead we built it our self
+			spaces = 0
+			if tn.getText().endswith(' ') or tn.getText().endswith('\t'):
+				txt = tn.getText().replace('\t', ' ' * int(tn.getTabWidth()))
+				spaces = float(len(txt) - len(txt.rstrip(' ')))
+				spaces = tn.calcWidth(' ') * spaces
+			tn.setCardAsMargin(p, p + spaces, p, p)
 
 		if self.hasSize():
 			tn.setCardActual(*beastSpriteOptions.getSize(self))
