@@ -1,0 +1,92 @@
+1) Sprite theory
+    Every GUI element is composed of smaller, sub-elements, each customizable.
+    Consider the following example, where you want a checkbox.
+    Checkbox is a sprite, with changable text, background, etc.
+        -> A child of checkbox is check (the actual check icon), with changable text, background, etc, and is a sprite too.
+
+2) Sprite state theory
+    In the above example, you may want to have a special effect when someone rolls the pointer over the entire checkbox,
+    or only when they roll the mouse over the actual check icon. To do this, you can apply this effect under a sprite state.
+    Each sprite has different options for each state, when interacted with by the user.
+    There are the following states:
+        "default", when no user action is present on this sprite
+        "hover", when the user has the pointer over this sprite
+        "click", when the user has the left-mouse button held down with the pointer over this sprite
+        "focus", when this sprite was the last sprite to have been previously clicked, and the left-mouse button released
+        "disabled", when this sprite is disabled and responds to no user interaction.
+
+3) Sprite state option inheritance theory
+    A sprite may only use one state's options at a time, however options from other states are dynamically inherited.
+    Consider the following:
+        The "default" state has a background color of red, the user positions the pointer over the sprite,
+        and the sprite enters the "hover" state, at this point there is no background color option applied
+        to the "hover" state, so instead the background color option of the "default" state, is applied to the
+        sprite even while in the "hover" state.
+    State inheritance layout:
+        "disabled" state inherits no options from other states
+        "default" state inherits no options from other states
+        "hover" state inherits options from the "default" state
+        "click" state inherits options from the "hover" state, then the "default" state
+        "focus" state inherits options from the "click" state, then the "hover" state, then the "default" state
+
+4) RTT Caching Theory
+    When you have a complex GUI, built up of several hundred individual Sprites, you'll too often hit GPU limits,
+    and your performance (FPS) will drop dramatically. A rule of thumb is to never go above 300 geoms being
+    individually sent to the GPU, you can go more, only that is the general area that most modern day games
+    stay within.
+
+    In actual 3d enviornments, the fix for this is to essentially merge geoms that never need to be individually
+    transformed, moved, or otherwise changed, into the same geom. In Panda3D this would be called flattening.
+    However in 2d complex graphical user interfaces, you'll typically need most elements to be changed alot.
+    Since merging geoms (flattening nodes) is typically a performance intensive call (normally only done once
+    in 3d enviornments), when using 2d GUI's, we need a different approach to fixing the geom limit, since
+    mergin/flattening the geoms/nodes would be too performance intensive.
+
+    All the above, to explain the need for render to texture (RTT) caching.
+
+    For render to texture caching to work, there are several things that need to be taken into account,
+    for instance, we need to keep track of when any visual appearance changes on any Sprite that is going
+    to be RTT cached, so that we know to update the texture version of the Sprite, essentially re-rendering
+    that Sprite.
+
+    Another thing to take into account, is what parts of the GUI are dynamic, and need to be updated more or
+    less, each frame. For instance, a calender widget, would only be updated when the user actually interacted
+    with it, where as a chat box, would update more often (whenever other users typed messages) and a miniture
+    map (minimap) for player navigation, might update every frame depending on what's happening.
+
+    To solve these issues, we do a couple of things:
+    1. Keep track of any visual appearance changes of Sprites (done in the Sprite class automagically)
+    2. Keep sort of collections of Sprites, that are considered either dynamic, or non-dynamic (aka static)
+
+    The section "Windows", describes the so-called collections of Sprites.
+
+5) Windows
+    Creating texture buffers is cheap, and rendering to several of them at the same time, is slow,
+    and using a buffer for each GUI element, would absolutely kill your applications performance.
+    Thus Windows exist.
+
+    A Window is a collection of Sprites, and there is no visual appearance for a Window itself,
+    so despite the name, there may be no background for it, or title bar, or exit button, a Window
+    is just a collection of Sprites.
+    That collection of Sprites itself, may define the visual appearance, (for instance a background
+    Sprite, an title bar Sprite, and an exit button Sprite, etc), however the Window itself has no
+    visual apperance, period.
+
+    Windows keep collections of Sprites within them, and a window may be defined as dynamic (changes
+    alot, or every frame) or non-dynamic (aka static, it will change very little, at least less than
+    every frame).
+
+    A dynamic Window will be rendered normally, every single frame. Dynamic Windows are good choices
+    for things that change alot, a player navigation minimap would be a good example, since it'll
+    probably be updated each frame with a new view of the 3D map itself.
+
+    A non-dynamic Window will be rendered into a texture buffer (RTT caching), and will only be rendered
+    again once one or more of the Sprites within the Window actually change visual appearance. In other
+    words, when an update to the texture is actually required (a re-render)
+
+    So it's important that Windows contain groups of Sprites that make logical sense, for instance, it
+    would be a good idea to contain a minimap within it's own Window, where as it would be a bad idea
+    to contain a minimap within the same Window as your complex GUI widget (a calender, say) that barely
+    updates except when the user interacts with it.
+
+

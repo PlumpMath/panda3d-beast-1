@@ -1,8 +1,7 @@
-#! /usr/bin/python
-#---------------------------------------------------------------------------#
-#- Beast - An Panda3d user interface library - See included "License.txt" - #
-#---------------------------------------------------------------------------#
-#- Beast, beastGlobals.py contains the globals for beast
+'''
+    This file is part of Beast, a Panda3D user interface library.
+    See included "License.txt"
+'''
 from direct.showbase.DirectObject import DirectObject
 from panda3d.core import ConfigVariableDouble, ConfigVariableBool, PGTop, PGButton, MouseButton, CardMaker, TransparencyAttrib
 from beastNodePath import *

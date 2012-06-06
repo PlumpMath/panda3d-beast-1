@@ -1,0 +1,21 @@
+Features implimented are marked with an [x], non-implimented features are marked with an [ ].
+
+Likely to impliment:
+[ ] Dynamically Scaleable GUI
+[ ] Cache-to-texture
+[ ] Moveable Windows
+[ ] Text
+[ ] Buttons
+[ ] Text Input
+[ ] Check Box
+[ ] Radio Button
+
+Unlikely to impliment:
+[ ] Tooltips
+[ ] Progress Bar
+[ ] Scrolling lists
+[ ] Drop down menu
+[ ] Spinner Knobs
+[ ] Non-Manual Layout
+[ ] Tables
+[ ] Tabsets
