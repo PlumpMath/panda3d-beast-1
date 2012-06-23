@@ -1,11 +1,13 @@
 from panda3d.core import *
-loadPrcFileData('', 'support-render-texture 1') #- enable or disable render to texture support, this is Panda/GPU
+loadPrcFileData('', 'support-render-texture #t')
 loadPrcFileData('', 'threading-model Cull/Draw')
-loadPrcFileData('', 'support-threading #t')
+loadPrcFileData('', 'support-threads #t')
 loadPrcFileData('', 'video-sync #f')
+loadPrcFileData('', 'show-frame-rate-meter #t')
+loadPrcFileData('', 'want-pstats #t')
 
-loadPrcFileData('', 'beast-render-cache #t') #- (RTT caching) Use render to texture caching, greatly improves performance
-loadPrcFileData('', 'beast-force-new-frame #t') #- Force rendering of a new frame upon updates, improves responsiveness
+loadPrcFileData('', 'beast-render-cache #f') #- (RTT caching) Use render to texture caching, greatly improves performance
+loadPrcFileData('', 'beast-force-new-frame #f') #- Force rendering of a new frame upon updates, improves responsiveness
 loadPrcFileData('', 'beast-debug #f') #- This is mostly 100% useless to you.
 
 import direct.directbase.DirectStart
@@ -44,5 +46,11 @@ for i in range(100):
     click.setBorderColor('#00FF00')
 
     s.updateToState()
+
+from direct.actor.Actor import Actor
+panda = Actor('models/panda-model', {'walk': 'models/panda-walk4'})
+panda.reparentTo(render)
+panda.loop('walk')
+panda.setScale(0.5)
 
 run()

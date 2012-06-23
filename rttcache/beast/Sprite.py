@@ -18,6 +18,9 @@ from SpriteOptions import *
 
 SpriteCounter = 0
 
+import threading
+base.textThreadLock = threading.Lock()
+
 class Sprite(NodePath, DirectObject):
     #- Just constant identifiers
     MouseLeftDown = 'left-down'
@@ -63,7 +66,8 @@ class Sprite(NodePath, DirectObject):
 
         #- Use TextNode to generate both text and cards for displaying background images
         self.__textNode = TextNode(name)
-        self.__textNodeNp = self.attachNewNode(self.__textNode)
+        self.__textNodeNp = None
+        #self.__textNodeNp = self.attachNewNode(self.__textNode)
         #self.__textNode.setCardDecal(True) #- This is what we would do, should Sprite support being non-under PGTop
 
         self.accept(self.__pgItem.getPressEvent(MouseButton.one()), self.__onMouse, [Sprite.MouseLeftDown])
@@ -199,7 +203,7 @@ class Sprite(NodePath, DirectObject):
             self._applySpriteOptions(SpriteOptions.combine(defaultOptions, hoverOptions, clickOptions))
         elif self.__state == 'focus':
             self._applySpriteOptions(SpriteOptions.combine(defaultOptions, focusOptions))
-        elif self.__state == 'disaled':
+        elif self.__state == 'disabled':
             self._applySpriteOptions(SpriteOptions.combine(defaultOptions, disabledOptions))
 
     def _applySpriteOptions(self, options):
@@ -244,10 +248,12 @@ class Sprite(NodePath, DirectObject):
 
         if options.hasFontSize():
             #- FIXME! change for point2d later
-            self.__textNodeNp.setScale(1.0 / options.getFontSize())
+            textNodeScale = 1.0 / options.getFontSize() #- Applied later
+        #    #self.__textNodeNp.setScale(1.0 / options.getFontSize())
         # FIXME? Make sure it's 4 spaces    self.__textNode.setTabWidth(options.getFontSize() * 4.0)
         else:
-            self.__textNodeNp.setScale(1.0)
+            textNodeScale = 1.0
+        #    #self.__textNodeNp.setScale(1.0)
 
         if options.hasBackgroundColor():
             color = options.getBackgroundColor().getAsFloat()
@@ -281,17 +287,21 @@ class Sprite(NodePath, DirectObject):
             #- Offset the TextNode so it only extends right and down
 
             #- FIXME! change for point2d later? (Does scale apply there even haha?)
-            s = self.__textNodeNp.getScale().getX()
+            s = textNodeScale
             l, r, b, t = l*s, r*s, b*s, t*s
 
-            self.__textNodeNp.setX(-l)
-            self.__textNodeNp.setZ(-t)
+            textNodeX = -l #- Applied later
+            textNodeZ = -t #- Applied later
+            #self.__textNodeNp.setX(-l)
+            #self.__textNodeNp.setZ(-t)
             self.__pgItem.setActive(True) #- It has a size now, it's active
             self.__pgItem.setFrame(0, -l + r, -t + b, 0)
         else:
             self.__textNode.setWtext(u' ') #- It's important to have a space, otherwise no card is rendered!
-            self.__textNodeNp.setX(0)
-            self.__textNodeNp.setZ(0)
+            textNodeX = 0 #- Applied later
+            textNodeZ = 0 #- Applied later
+            #self.__textNodeNp.setX(0)
+            #self.__textNodeNp.setZ(0)
             if not options.hasSize():
                 self.__pgItem.setFrame(0, 0, 0, 0)
 
@@ -309,8 +319,10 @@ class Sprite(NodePath, DirectObject):
         if options.hasTextColor():
             color = options.getTextColor().getAsFloat()
             self.__textNode.setTextColor(*color)
-        else:
+            #self.__textNodeNp.setColor(*color)
+        #else:
             self.__textNode.setTextColor(0, 0, 0, 1) #- Black
+        #    self.__textNodeNp.clearColor()
 
         if options.hasTextSmallCaps():
             self.__textNode.setSmallCaps(options.getTextSmallCaps())
@@ -342,6 +354,36 @@ class Sprite(NodePath, DirectObject):
             self.__textNode.setShadowColor(*color)
         else:
             self.__textNode.clearShadowColor()
+
+        if self.__textNodeNp:
+            self.__textNodeNp.remove()
+        self.__textNodeNp = self.attachNewNode(self.__textNode.generate())
+        self.__textNodeNp.setScale(textNodeScale)
+        self.__textNodeNp.setX(textNodeX)
+        self.__textNodeNp.setZ(textNodeZ)
+
+        '''
+        def setup(self, textNodeScale, textNodeX, textNodeZ):
+            print 'getting lock...'
+            base.textThreadLock.acquire()
+            print 'Got lock'
+            if self.__textNodeNp:
+                self.__textNodeNp.remove()
+            self.__textNodeNp = self.attachNewNode('foobar')
+            #textNode.generate()
+            print 'yes, it generated'
+            base.textThreadLock.release()
+        '''
+            #self.__textNodeNp = self.attachNewNode(self.__textNode.generate())
+            #self.__textNodeNp.setScale(textNodeScale)
+            #self.__textNodeNp.setX(textNodeX)
+            #self.__textNodeNp.setZ(textNodeZ)
+
+        '''
+        import direct.stdpy.threading
+        t = threading.Thread(target=setup, args=(self, textNodeScale, textNodeX, textNodeZ))
+        t.start()
+        '''
 
         if dirty:
             messenger.send('beastCollectionUpdate')
